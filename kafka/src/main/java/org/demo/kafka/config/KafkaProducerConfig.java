@@ -3,8 +3,7 @@ package org.demo.kafka.config;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.demo.kafka.Message;
-import org.springframework.beans.factory.annotation.Value;
+import org.demo.kafka.domain.Match;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
@@ -16,29 +15,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-public class KaftaProducerConfig {
-
-    @Value("${spring.kafka.bootstrap-servers}")
-    private String boostrapServers;
-
+public class KafkaProducerConfig {
     private Map<String, Object> producerConfig() {
-        Map<String, Object> props = new HashMap<>();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, boostrapServers);
+        var props = new HashMap<String, Object>();
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        //props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class); //serialize string
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
 
         return props;
     }
 
     @Bean
-    public ProducerFactory<String, Message> producerFactory() {
+    public ProducerFactory<String, Match> producerFactory() {
         return new DefaultKafkaProducerFactory<>(producerConfig());
     }
 
     @Bean
-    public KafkaTemplate<String, Message> kafkaTemplate(ProducerFactory<String, Message> producerFactory) {
+    public KafkaTemplate<String, Match> kafkaTemplate(ProducerFactory<String, Match> producerFactory) {
         return new KafkaTemplate<>(producerFactory);
-
     }
 }
